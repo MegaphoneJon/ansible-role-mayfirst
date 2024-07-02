@@ -1,0 +1,18 @@
+- name: Authenticate with May First
+  ansible.builtin.uri:
+    url: https://members.mayfirst.org/cp/api.php
+    method: POST
+    body:
+      user_name: "{{ ansible_user }}"
+      user_pass: "{{ lookup('community.general.passwordstore', client + '/mayfirst/' + ansible_user) }}"
+      action: grant
+    body_format: form-urlencoded
+    status_code: 200
+    return_content: true
+  failed_when: "'Access granted' not in response.content"
+  register: response
+  delegate_to: 127.0.0.1
+
+- name: Set ansible_host to shell.mayfirst.org
+  set_fact:
+    ansible_host: shell.mayfirst.org
